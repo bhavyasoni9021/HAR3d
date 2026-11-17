@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Human Activity Recognition with a Hybrid CNN-LSTM — interactive 3D case study</title>
+  <meta name="description" content="Interactive 3D explanation of a hybrid CNN-LSTM that recognises six human activities from raw smartphone sensor signals (92.77% test accuracy on unseen subjects)." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#problem">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><path d="M3 18h5l3-9 4 15 4-12 3 6h7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>HAR CNN-LSTM</span></a>
+  <nav aria-label="Sections">
+    <a href="#problem">Problem</a><a href="#data">Data</a><a href="#model">Model</a><a href="#lab">Live lab</a><a href="#results">Results</a><a href="#errors">Errors</a><a href="#roadmap">Roadmap</a><a href="#theory">Theory</a><a href="#team">Team</a>
+  </nav>
+  <span class="status" id="status" title="Backend status"><i></i><b>connecting…</b></span>
+</header>
+
+<main id="top">
+<section class="hero" id="hero">
+  <canvas id="heroCanvas" aria-label="A 3D mannequin performing the six recognised activities beside streaming sensor traces"></canvas>
+  <div class="hero-copy">
+    <h1>Human activity recognition from <span class="grad">raw phone sensors</span></h1>
+    <p class="lede">A hybrid CNN-LSTM reads 2.56 seconds of accelerometer and gyroscope signal and names what the person is doing. It tells walking, stairs, sitting, standing and lying apart on people it has never seen.</p>
+    <div class="cta"><a class="btn primary" href="#lab">Try the live lab</a><a class="btn" href="#model">Explore the network in 3D</a></div>
+    <dl class="hero-stats">
+      <div><dt>Test accuracy</dt><dd id="hAcc">92.77%</dd></div>
+      <div><dt>Parameters</dt><dd id="hParams">230,342</dd></div>
+      <div><dt>Unseen test subjects</dt><dd>9</dd></div>
+    </dl>
+  </div>
+  <div class="hero-chip" id="heroChip" aria-live="polite"><i></i><div><span>Walking</span><small id="heroModel"></small></div></div>
+  <a class="scroll-cue" href="#problem" aria-label="Scroll to the next section"><b></b>Scroll</a>
+</section>
+
+<section id="problem" class="sec">
+  <div class="wrap two">
+    <div>
+      <h2>A phone already feels how you move</h2>
+      <p>Smartphones and smartwatches carry an accelerometer and a gyroscope that measure motion continuously. Turning those streams into a label such as “walking” or “sitting” is human activity recognition (HAR). It powers fitness and calorie tracking, fall detection for the elderly, rehabilitation monitoring, sleep analysis and phones that adapt to what you are doing.</p>
+      <p>Classic pipelines hand-craft hundreds of statistics per window (means, energy, FFT coefficients) and feed them to an SVM or random forest. They work, but they need expert knowledge and must be redesigned for every new sensor or placement. This project lets a neural network learn the features directly from the raw signal.</p>
+    </div>
+    <div class="aside-block">
+      <h3>The task</h3>
+      <p>Given a 2.56-second window of body acceleration, angular velocity and total acceleration from a waist-mounted phone, choose one of six activities.</p>
+      <h3>Why it is hard</h3>
+      <ol class="plain">
+        <li>Signals are noisy and differ between people in gait, speed and phone placement.</li>
+        <li>Some classes are almost twins: upstairs and downstairs, sitting and standing.</li>
+        <li>The model must stay small enough for a phone or an embedded board.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="wrap">
+    <h3 class="sub">Objectives</h3>
+    <ol class="objectives">
+      <li>Study the theory of CNNs and LSTMs, plus transfer learning, attention and GANs, as they apply to sensor time series.</li>
+      <li>Build an end-to-end CNN-LSTM in TensorFlow/Keras that learns from raw inertial signals, with no hand-made features.</li>
+      <li>Train it with sound regularisation: batch normalisation, dropout, early stopping, learning-rate scheduling and a stratified validation split.</li>
+      <li>Evaluate on unseen subjects with accuracy, precision, recall, F1 and the confusion matrix.</li>
+      <li>Analyse errors by class and by subject, then propose concrete improvements.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="data" class="sec alt">
+  <div class="wrap">
+    <h2>The data: 30 volunteers, one phone on the waist</h2>
+    <p class="lead">The UCI Human Activity Recognition dataset (Anguita et al., 2013) records a Samsung Galaxy S II at 50 Hz while volunteers aged 19–48 perform six activities. The signals are noise-filtered, total acceleration is split into body and gravity parts, and everything is cut into fixed windows.</p>
+    <div class="two">
+      <div>
+        <h3 class="sub">Cutting the stream into windows</h3>
+        <canvas id="sliceCanvas" class="plot" height="190" aria-label="A sensor trace with a sliding 2.56 second window that overlaps the previous one by half"></canvas>
+        <p class="note">Each window is 128 samples (2.56 s). Consecutive windows overlap by 50%, so every moment is seen twice. A window becomes a 128 × 9 tensor: body acceleration xyz, body gyroscope xyz, total acceleration xyz.</p>
+        <h3 class="sub">Preprocessing</h3>
+        <ol class="steps">
+          <li><b>Shift labels</b> to 0–5.</li>
+          <li><b>Hold out 15%</b> of the training windows as validation, stratified by class.</li>
+          <li><b>Standardise each channel</b> to zero mean and unit variance using training statistics only.</li>
+          <li><b>Save the mean and standard deviation</b> (<code>norm.npz</code>) and reuse them for validation, test and live inference, so nothing leaks from the test set.</li>
+        </ol>
+      </div>
+      <div>
+        <h3 class="sub">Dataset facts</h3>
+        <table class="tbl" id="datasetTable"></table>
+        <h3 class="sub">Class balance</h3>
+        <div id="classBars" class="classbars"></div>
+        <p class="note">The classes are close to balanced, so accuracy is a meaningful headline number. Macro-F1 is reported next to it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="model" class="sec">
+  <div class="wrap">
+    <h2>The model: local patterns first, then their rhythm</h2>
+    <p class="lead">Drag to orbit, scroll to zoom, hover a plate for its shape and click it to fly closer. The plates show <b>real activations</b> from the trained network for whichever window the live lab is classifying.</p>
+  </div>
+  <div class="wrap wide">
+    <div class="arch-frame">
+      <canvas id="archCanvas" aria-label="3D diagram of the CNN-LSTM layers with live activation heatmaps"></canvas>
+      <div class="tooltip" id="archTip" hidden></div>
+      <button class="btn small reset" id="archReset" type="button">Reset view</button>
+    </div>
+    <div class="layer-bar" id="layerBar" role="tablist" aria-label="Layers"></div>
+  </div>
+  <div class="wrap two">
+    <div id="layerInfo" class="layer-info" aria-live="polite"></div>
+    <div>
+      <h3 class="sub">Why a hybrid</h3>
+      <p><b>CNN stage.</b> Each 1-D filter spans 0.1 s across all nine channels and learns motion primitives such as a heel strike. Weight sharing means the pattern is found wherever it occurs. Two pooling steps shrink 128 time steps to 32 while the feature depth grows to 128.</p>
+      <p><b>LSTM stage.</b> Two stacked LSTMs read those 32 feature vectors in order. Gates decide what to remember, so the network can tell the asymmetric cadence of climbing from descending.</p>
+      <p><b>Regularisation.</b> Batch normalisation, dropout 0.3, early stopping and learning-rate decay keep the train and validation loss almost identical.</p>
+    </div>
+  </div>
+  <div class="wrap two">
+    <div><h3 class="sub">Layer summary</h3><table class="tbl" id="layerTable"></table></div>
+    <div><h3 class="sub">Training configuration</h3><table class="tbl" id="trainTable"></table>
+      <p class="note">Training accuracy climbs from about 77% after epoch one to about 96%, validation settles near 95.8%, and the two losses converge (≈0.09 and ≈0.085). Validation windows come from the same 21 subjects as training, so this is optimistic compared with the unseen test subjects.</p></div>
+  </div>
+</section>
+
+<section id="lab" class="sec alt">
+  <div class="wrap">
+    <h2>Sensor lab: classify a window yourself</h2>
+    <p class="lead">Pick an activity, change the noise or tilt the phone, and the Node backend runs the real trained weights on the window. The mannequin acts out what the model decided.</p>
+    <div class="lab">
+      <div class="lab-stage"><canvas id="labCanvas" aria-label="Mannequin showing the activity the model predicts"></canvas><div class="lab-tag" id="labTag">Model sees: –</div></div>
+      <div class="lab-side">
+        <div class="tabs sm" id="labTabs" role="tablist" aria-label="How to provide a window"></div>
+
+        <div class="lpanel" id="p-sim">
+          <div class="field"><span class="fl">Window to generate</span><div class="seg" id="actSeg" role="group" aria-label="Activity"></div></div>
+          <div class="field"><label for="noise">Sensor noise <output id="noiseOut">1.0×</output></label><input type="range" id="noise" min="0" max="4" step="0.1" value="1" /></div>
+          <div class="field"><label for="tilt">Phone tilt <output id="tiltOut">0°</output></label><input type="range" id="tilt" min="-15" max="30" step="1" value="0" /><small>Tilt a standing person’s phone back by about 10° and the model starts calling it sitting. This is the dominant error in the real test set.</small></div>
+          <div class="field row"><label for="seed">Subject</label><input type="number" id="seed" min="1" max="9999" value="3" /><button class="btn small" id="shuffle" type="button">New subject</button></div>
+        </div>
+
+        <div class="lpanel" id="p-values" hidden>
+          <p class="note">Set a few numbers and a 2.56 s window is built from them: gravity gives the posture, a sine wave gives the body movement and rotation. Start from typical values, then change them and watch the prediction react.</p>
+          <div class="field"><span class="fl">Typical values for</span><div class="seg" id="presetSeg" role="group" aria-label="Preset"></div><small id="presetNote"></small></div>
+          <div id="valueSliders"></div>
+        </div>
+
+        <div class="lpanel" id="p-real" hidden>
+          <p class="note">Browse genuine windows from the UCI HAR test set, which the model never trained on.</p>
+          <div class="field"><label for="realAct">True activity</label><select id="realAct"></select></div>
+          <div class="field row"><label class="chk"><input type="checkbox" id="realWrong" /> Only misclassified</label><button class="btn small" id="realRandom" type="button">Random sample</button></div>
+          <div class="field"><label for="realPos">Sample <output id="realOut">–</output></label><input type="range" id="realPos" min="0" max="0" value="0" /></div>
+          <small id="realMsg" class="msg"></small>
+        </div>
+
+        <div class="lpanel" id="p-upload" hidden>
+          <p class="note">Upload a recording as <b>.csv, .json or .npy</b> with <b>9 columns</b> (body acc x y z, body gyro x y z, total acc x y z) and at least <b>128 rows</b>. Longer recordings are split into overlapping windows (50% overlap) and every window is classified.</p>
+          <div class="field row"><label class="btn small" for="file">Choose file</label><input id="file" type="file" accept=".json,.csv,.npy" hidden /><button class="btn small" id="dlExample" type="button">Download example CSV</button></div>
+        </div>
+        <small id="fileMsg" class="msg" role="status"></small>
+      </div>
+    </div>
+    <div class="lab-out">
+      <div class="verdict" id="verdict" aria-live="polite"></div>
+      <div class="probs" id="probs"></div>
+    </div>
+    <div id="seqPanel" hidden>
+      <h3 class="sub" id="seqTitle">Recording timeline</h3>
+      <p class="note">Each block is one window. Click a block to inspect that window in 3D and in the network above.</p>
+      <canvas id="timelineCanvas" class="plot" height="64" aria-label="Predicted activity for every window of the recording"></canvas>
+      <div class="two">
+        <div><h3 class="sub">Class probabilities over time</h3><canvas id="probCanvas" class="plot" height="170" aria-label="Probability of each activity across the windows"></canvas></div>
+        <div><h3 class="sub">Time spent per activity</h3><div id="seqSummary" class="classbars"></div></div>
+      </div>
+    </div>
+    <canvas id="plotCanvas" class="plot" height="300" aria-label="The nine sensor channels of the current window"></canvas>
+    <p class="note" id="sourceNote">Windows from the simulator are synthetic: they imitate gait harmonics, gravity orientation and sensor noise, and are not recordings from the dataset. Add the UCI HAR dataset to <code>data/</code> and the <b>Real samples</b> tab serves genuine test windows.</p>
+  </div>
+</section>
+
+<section id="results" class="sec">
+  <div class="wrap">
+    <h2>Results on nine people the model never saw</h2>
+    <p class="lead" id="resultsLead">The saved best model scores <b>92.77%</b> (2,734 of 2,947 windows) with a macro F1 of <b>0.929</b>.</p>
+    <div class="two top">
+      <div>
+        <div class="arch-frame cm-frame"><canvas id="cmCanvas" aria-label="3D confusion matrix"></canvas><div class="tooltip" id="cmTip" hidden></div></div>
+        <div class="cm-tools"><button class="btn small" id="cmScale" type="button">Height: square root</button><span class="note">Drag to orbit. Bars on the diagonal are correct predictions.</span></div>
+      </div>
+      <div>
+        <h3 class="sub">Per-class report</h3>
+        <table class="tbl num" id="classTable"></table>
+        <p class="note">Walking, stairs and laying are essentially solved. Sitting and standing sit near 0.82–0.83 F1.</p>
+      </div>
+    </div>
+    <div class="two">
+      <div>
+        <h3 class="sub">Accuracy for each unseen subject</h3>
+        <div id="subjectBars" class="subjbars"></div>
+        <p class="note" id="subjectNote">Subjects 2 and 4 are read from the report’s Figure 3.5 and are approximate.</p>
+      </div>
+      <div>
+        <h3 class="sub">Training curves</h3>
+        <figure class="paper"><img src="/img/training_curves.png" alt="Training and validation accuracy and loss per epoch" loading="lazy" /></figure>
+        <p class="note">For context, the dataset authors reported about 96% with an SVM on 561 hand-made features. Reaching 92.77% from raw signals alone is competitive but not yet better than the strongest feature-based baselines.</p>
+      </div>
+    </div>
+    <p class="note" id="metricSource"></p>
+  </div>
+</section>
+
+<section id="errors" class="sec alt">
+  <div class="wrap">
+    <h2>Where the model goes wrong</h2>
+    <p class="lead">There are 213 errors in total. They are concentrated, which makes them fixable.</p>
+    <div class="two top">
+      <div>
+        <h3 class="sub">Most frequent confusions</h3>
+        <table class="tbl num" id="errTable"></table>
+        <h3 class="sub">Sitting versus standing: 80% of all errors</h3>
+        <p>Both are static, so body acceleration and gyroscope are near zero. The only reliable cue is the phone’s orientation against gravity, which is subtle after per-channel standardisation and changes with how each person wears the phone. Standing is mistaken for sitting more often than the reverse, so the decision boundary leans towards sitting.</p>
+      </div>
+      <div>
+        <h3 class="sub">Upstairs versus downstairs: 12%</h3>
+        <p>Both are periodic gaits that differ in vertical acceleration and cadence, which varies between people. Twenty-five upstairs windows were labelled downstairs and none the other way round, hinting at a subject-specific bias.</p>
+        <h3 class="sub">The failures are personal</h3>
+        <p>Five subjects (12, 13, 18, 20, 24) are classified at 99.7–100%, while subject 10 (72.4%) and subject 9 (80.2%) carry a large share of the errors. A single accuracy number hides how differently the model treats different people.</p>
+        <h3 class="sub">Confidence is a warning light</h3>
+        <div class="conf" id="confBars"></div>
+        <p class="note">Mean softmax confidence is 0.964 on correct predictions and 0.806 on wrong ones, so low-confidence windows can be flagged or smoothed over neighbouring windows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="sec">
+  <div class="wrap">
+    <h2>How to make it better</h2>
+    <p class="lead">Each proposal targets a weakness found above. Open a row to see how it would be implemented.</p>
+    <div id="roadmapList" class="roadmap"></div>
+    <h3 class="sub">Future work</h3>
+    <ul class="plain bullets" id="futureList"></ul>
+  </div>
+</section>
+
+<section id="theory" class="sec alt">
+  <div class="wrap">
+    <h2>The theory behind it</h2>
+    <p class="lead">CNNs and LSTMs are used in the model. Transfer learning, attention and GANs are not in the baseline, but each answers one of its weaknesses.</p>
+    <div class="tabs" role="tablist" id="theoryTabs"></div>
+    <div id="theoryBody" class="theory"></div>
+  </div>
+</section>
+
+<section id="team" class="sec">
+  <div class="wrap two">
+    <div>
+      <h2>The team</h2>
+      <p class="lead" id="teamCourse"></p>
+      <table class="tbl" id="teamTable"></table>
+      <p class="note" id="teamInst"></p>
+      <p><a class="btn" id="repoLink" href="#" target="_blank" rel="noopener">Source code on GitHub</a></p>
+    </div>
+    <div>
+      <h3 class="sub">How this website works</h3>
+      <p>The page is a Vite + three.js front end talking to a Node/Express API. The trained Keras weights were exported once and the whole forward pass (convolutions, batch norm, two LSTMs, softmax) is re-implemented in JavaScript, so inference needs no Python.</p>
+      <table class="tbl" id="apiTable"></table>
+      <details class="refs"><summary>References</summary><ol id="refList"></ol></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">Human Activity Recognition Using a Hybrid CNN-LSTM Network · 21CSC406J Neural Networks and Deep Learning · SRM Institute of Science and Technology</footer>
+</body>
+</html>

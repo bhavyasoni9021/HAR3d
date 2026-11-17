@@ -1,0 +1,170 @@
+{
+ "dtype": "float32",
+ "total": 230342,
+ "tensors": {
+  "conv1.w": {
+   "shape": [
+    5,
+    9,
+    64
+   ],
+   "offset": 0,
+   "length": 2880
+  },
+  "conv1.b": {
+   "shape": [
+    64
+   ],
+   "offset": 2880,
+   "length": 64
+  },
+  "bn1.gamma": {
+   "shape": [
+    64
+   ],
+   "offset": 2944,
+   "length": 64
+  },
+  "bn1.beta": {
+   "shape": [
+    64
+   ],
+   "offset": 3008,
+   "length": 64
+  },
+  "bn1.mean": {
+   "shape": [
+    64
+   ],
+   "offset": 3072,
+   "length": 64
+  },
+  "bn1.var": {
+   "shape": [
+    64
+   ],
+   "offset": 3136,
+   "length": 64
+  },
+  "conv2.w": {
+   "shape": [
+    5,
+    64,
+    128
+   ],
+   "offset": 3200,
+   "length": 40960
+  },
+  "conv2.b": {
+   "shape": [
+    128
+   ],
+   "offset": 44160,
+   "length": 128
+  },
+  "bn2.gamma": {
+   "shape": [
+    128
+   ],
+   "offset": 44288,
+   "length": 128
+  },
+  "bn2.beta": {
+   "shape": [
+    128
+   ],
+   "offset": 44416,
+   "length": 128
+  },
+  "bn2.mean": {
+   "shape": [
+    128
+   ],
+   "offset": 44544,
+   "length": 128
+  },
+  "bn2.var": {
+   "shape": [
+    128
+   ],
+   "offset": 44672,
+   "length": 128
+  },
+  "lstm1.W": {
+   "shape": [
+    128,
+    512
+   ],
+   "offset": 44800,
+   "length": 65536
+  },
+  "lstm1.U": {
+   "shape": [
+    128,
+    512
+   ],
+   "offset": 110336,
+   "length": 65536
+  },
+  "lstm1.b": {
+   "shape": [
+    512
+   ],
+   "offset": 175872,
+   "length": 512
+  },
+  "lstm2.W": {
+   "shape": [
+    128,
+    256
+   ],
+   "offset": 176384,
+   "length": 32768
+  },
+  "lstm2.U": {
+   "shape": [
+    64,
+    256
+   ],
+   "offset": 209152,
+   "length": 16384
+  },
+  "lstm2.b": {
+   "shape": [
+    256
+   ],
+   "offset": 225536,
+   "length": 256
+  },
+  "dense1.w": {
+   "shape": [
+    64,
+    64
+   ],
+   "offset": 225792,
+   "length": 4096
+  },
+  "dense1.b": {
+   "shape": [
+    64
+   ],
+   "offset": 229888,
+   "length": 64
+  },
+  "dense2.w": {
+   "shape": [
+    64,
+    6
+   ],
+   "offset": 229952,
+   "length": 384
+  },
+  "dense2.b": {
+   "shape": [
+    6
+   ],
+   "offset": 230336,
+   "length": 6
+  }
+ }
+}

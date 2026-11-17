@@ -1,0 +1,544 @@
+{
+ "project": {
+  "title": "Human Activity Recognition Using a Hybrid CNN-LSTM Network",
+  "subtitle": "Case study report",
+  "course": "21CSC406J – Neural Networks and Deep Learning",
+  "degree": "Bachelor of Technology in Computer Science Engineering, specialisation in AIML",
+  "department": "Department of Computational Intelligence, College of Engineering and Technology",
+  "institution": "SRM Institute of Science and Technology, Kattankulathur – 603 203",
+  "session": "Academic year 2026–2027, odd semester",
+  "month": "November 2026",
+  "team": [
+   {
+    "name": "Aira K Salish",
+    "reg": "RA2311026011017"
+   },
+   {
+    "name": "Sheril T Mario",
+    "reg": "RA2311026011014"
+   },
+   {
+    "name": "Bhavya Soni",
+    "reg": "RA2311026011003"
+   },
+   {
+    "name": "Roshini Riya",
+    "reg": "RA2311026011050"
+   }
+  ],
+  "supervisor": {
+   "name": "Dr. Reka S",
+   "role": "Supervisor, Assistant Professor, Department of Computational Intelligence"
+  },
+  "head": {
+   "name": "Dr. R. Annie Uthra",
+   "role": "Professor & Head, Department of Computational Intelligence"
+  },
+  "repo": "https://github.com/sheril297/HAR-CNN-LSTM"
+ },
+ "headline": {
+  "accuracy": 92.77,
+  "macroF1": 0.929,
+  "testWindows": 2947,
+  "correct": 2734,
+  "errors": 213,
+  "parameters": 230342,
+  "trainable": 229958,
+  "testSubjects": 9,
+  "trainSubjects": 21
+ },
+ "activities": [
+  {
+   "id": "WALKING",
+   "short": "Walk",
+   "dynamic": true
+  },
+  {
+   "id": "WALKING_UPSTAIRS",
+   "short": "Up",
+   "dynamic": true
+  },
+  {
+   "id": "WALKING_DOWNSTAIRS",
+   "short": "Down",
+   "dynamic": true
+  },
+  {
+   "id": "SITTING",
+   "short": "Sit",
+   "dynamic": false
+  },
+  {
+   "id": "STANDING",
+   "short": "Stand",
+   "dynamic": false
+  },
+  {
+   "id": "LAYING",
+   "short": "Lay",
+   "dynamic": false
+  }
+ ],
+ "perClass": [
+  {
+   "id": "WALKING",
+   "precision": 0.9939,
+   "recall": 0.9899,
+   "f1": 0.9919,
+   "support": 496
+  },
+  {
+   "id": "WALKING_UPSTAIRS",
+   "precision": 0.9823,
+   "recall": 0.9427,
+   "f1": 0.9621,
+   "support": 471
+  },
+  {
+   "id": "WALKING_DOWNSTAIRS",
+   "precision": 0.9313,
+   "recall": 1.0,
+   "f1": 0.9644,
+   "support": 420
+  },
+  {
+   "id": "SITTING",
+   "precision": 0.7962,
+   "recall": 0.8513,
+   "f1": 0.8228,
+   "support": 491
+  },
+  {
+   "id": "STANDING",
+   "precision": 0.8691,
+   "recall": 0.7989,
+   "f1": 0.8325,
+   "support": 532
+  },
+  {
+   "id": "LAYING",
+   "precision": 1.0,
+   "recall": 0.9981,
+   "f1": 0.9991,
+   "support": 537
+  }
+ ],
+ "averages": {
+  "macro": {
+   "precision": 0.9288,
+   "recall": 0.9302,
+   "f1": 0.9288
+  },
+  "weighted": {
+   "precision": 0.9288,
+   "recall": 0.9277,
+   "f1": 0.9276
+  }
+ },
+ "confusion": [
+  [
+   491,
+   0,
+   5,
+   0,
+   0,
+   0
+  ],
+  [
+   2,
+   444,
+   25,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   420,
+   0,
+   0,
+   0
+  ],
+  [
+   1,
+   7,
+   1,
+   418,
+   64,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   107,
+   425,
+   0
+  ],
+  [
+   0,
+   1,
+   0,
+   0,
+   0,
+   536
+  ]
+ ],
+ "subjects": [
+  {
+   "id": 2,
+   "accuracy": 89.1,
+   "approx": true
+  },
+  {
+   "id": 4,
+   "accuracy": 87.0,
+   "approx": true
+  },
+  {
+   "id": 9,
+   "accuracy": 80.2
+  },
+  {
+   "id": 10,
+   "accuracy": 72.4
+  },
+  {
+   "id": 12,
+   "accuracy": 100.0
+  },
+  {
+   "id": 13,
+   "accuracy": 99.7
+  },
+  {
+   "id": 18,
+   "accuracy": 100.0
+  },
+  {
+   "id": 20,
+   "accuracy": 100.0
+  },
+  {
+   "id": 24,
+   "accuracy": 100.0
+  }
+ ],
+ "confidence": {
+  "correct": 0.964,
+  "wrong": 0.806
+ },
+ "topErrors": [
+  {
+   "from": "STANDING",
+   "to": "SITTING",
+   "count": 107,
+   "pctOfClass": 20.1,
+   "pctOfErrors": 50.2
+  },
+  {
+   "from": "SITTING",
+   "to": "STANDING",
+   "count": 64,
+   "pctOfClass": 13.0,
+   "pctOfErrors": 30.0
+  },
+  {
+   "from": "WALKING_UPSTAIRS",
+   "to": "WALKING_DOWNSTAIRS",
+   "count": 25,
+   "pctOfClass": 5.3,
+   "pctOfErrors": 11.7
+  },
+  {
+   "from": "SITTING",
+   "to": "WALKING_UPSTAIRS",
+   "count": 7,
+   "pctOfClass": 1.4,
+   "pctOfErrors": 3.3
+  },
+  {
+   "from": "WALKING",
+   "to": "WALKING_DOWNSTAIRS",
+   "count": 5,
+   "pctOfClass": 1.0,
+   "pctOfErrors": 2.3
+  }
+ ],
+ "dataset": {
+  "source": "UCI Machine Learning Repository – Human Activity Recognition Using Smartphones (Anguita et al., 2013)",
+  "rows": [
+   [
+    "Subjects",
+    "30 volunteers (21 train / 9 test, disjoint)"
+   ],
+   [
+    "Sensors",
+    "Tri-axial accelerometer + gyroscope, smartphone on the waist"
+   ],
+   [
+    "Sampling rate",
+    "50 Hz"
+   ],
+   [
+    "Window",
+    "2.56 s = 128 time steps, 50% overlap"
+   ],
+   [
+    "Input channels",
+    "9 (body acc xyz, body gyro xyz, total acc xyz)"
+   ],
+   [
+    "Classes",
+    "6"
+   ],
+   [
+    "Training windows",
+    "7,352 (6,249 train + 1,103 validation)"
+   ],
+   [
+    "Test windows",
+    "2,947"
+   ]
+  ],
+  "trainCounts": [
+   1226,
+   1073,
+   986,
+   1286,
+   1374,
+   1407
+  ],
+  "testCounts": [
+   496,
+   471,
+   420,
+   491,
+   532,
+   537
+  ],
+  "channels": [
+   "body_acc_x",
+   "body_acc_y",
+   "body_acc_z",
+   "body_gyro_x",
+   "body_gyro_y",
+   "body_gyro_z",
+   "total_acc_x",
+   "total_acc_y",
+   "total_acc_z"
+  ]
+ },
+ "layers": [
+  {
+   "id": "input",
+   "name": "Input window",
+   "kind": "input",
+   "shape": [
+    128,
+    9
+   ],
+   "params": 0,
+   "detail": "128 time steps × 9 inertial channels, standardised with training-set mean and standard deviation."
+  },
+  {
+   "id": "conv1",
+   "name": "Conv1D block 1",
+   "kind": "cnn",
+   "shape": [
+    64,
+    64
+   ],
+   "params": 3200,
+   "detail": "Conv1D(64 filters, kernel 5, same) → BatchNorm → ReLU → MaxPool(2) → Dropout(0.3). Each filter spans 0.1 s across all nine channels and learns a local motion primitive such as a foot strike.",
+   "paramBreakdown": "2,944 conv + 256 batch-norm"
+  },
+  {
+   "id": "conv2",
+   "name": "Conv1D block 2",
+   "kind": "cnn",
+   "shape": [
+    32,
+    128
+   ],
+   "params": 41600,
+   "detail": "Conv1D(128 filters, kernel 5, same) → BatchNorm → ReLU → MaxPool(2) → Dropout(0.3). Combines primitives into larger units such as a full step cycle, and shortens the sequence to 32 steps.",
+   "paramBreakdown": "41,088 conv + 512 batch-norm"
+  },
+  {
+   "id": "lstm1",
+   "name": "LSTM 128 (sequence)",
+   "kind": "lstm",
+   "shape": [
+    32,
+    128
+   ],
+   "params": 131584,
+   "detail": "Reads the 32-step feature sequence and returns a hidden state at every step, modelling the order and rhythm of the learned primitives."
+  },
+  {
+   "id": "lstm2",
+   "name": "LSTM 64 (final state)",
+   "kind": "lstm",
+   "shape": [
+    64
+   ],
+   "params": 49408,
+   "detail": "A second recurrent layer that compresses the whole window into a single 64-dimensional summary vector."
+  },
+  {
+   "id": "dense",
+   "name": "Dense 64 + ReLU",
+   "kind": "dense",
+   "shape": [
+    64
+   ],
+   "params": 4160,
+   "detail": "Fully connected layer with dropout that re-mixes the temporal summary before classification."
+  },
+  {
+   "id": "softmax",
+   "name": "Softmax output",
+   "kind": "output",
+   "shape": [
+    6
+   ],
+   "params": 390,
+   "detail": "Six probabilities, one per activity. The largest is the prediction."
+  }
+ ],
+ "training": [
+  [
+   "Framework",
+   "TensorFlow / Keras (Python)"
+  ],
+  [
+   "Optimiser",
+   "Adam, initial learning rate 1×10⁻³"
+  ],
+  [
+   "Loss",
+   "Sparse categorical cross-entropy"
+  ],
+  [
+   "Batch size / max epochs",
+   "64 / 40"
+  ],
+  [
+   "Dropout rate",
+   "0.3 (after every block)"
+  ],
+  [
+   "Early stopping",
+   "monitor val_loss, patience 8, restore best weights"
+  ],
+  [
+   "Learning-rate schedule",
+   "ReduceLROnPlateau, factor 0.5, patience 3, minimum 1×10⁻⁵"
+  ],
+  [
+   "Checkpoint",
+   "Best val_accuracy saved to best_model.keras"
+  ],
+  [
+   "Validation split",
+   "15% of the training set, stratified by class"
+  ],
+  [
+   "Random seed",
+   "42"
+  ]
+ ],
+ "improvements": [
+  {
+   "strategy": "Gravity / orientation branch",
+   "weakness": "Sit ↔ stand confusion",
+   "impact": "High",
+   "effort": "Low",
+   "how": "Add a parallel input carrying the low-frequency gravity component or tilt angles and concatenate it with the LSTM output before the classifier."
+  },
+  {
+   "strategy": "Attention / Bi-LSTM",
+   "weakness": "Brief cues, interpretability",
+   "impact": "Medium",
+   "effort": "Low",
+   "how": "Replace the final LSTM summary with attention pooling over the 32 LSTM outputs; the weights become an interpretable heat-map."
+  },
+  {
+   "strategy": "Augmentation (jitter, rotate, warp)",
+   "weakness": "Inter-subject variability",
+   "impact": "Medium–High",
+   "effort": "Low",
+   "how": "Gaussian jitter, magnitude scaling, small 3-D rotations (different phone orientations) and time-warping (different walking speeds)."
+  },
+  {
+   "strategy": "Hyperparameter search",
+   "weakness": "Sub-optimal configuration",
+   "impact": "Medium",
+   "effort": "Medium",
+   "how": "KerasTuner or Optuna over kernel size, filters, LSTM units, dropout and learning rate, using validation folds grouped by subject."
+  },
+  {
+   "strategy": "Class-weighted / focal loss",
+   "weakness": "Hard-class boundary",
+   "impact": "Low–Medium",
+   "effort": "Low",
+   "how": "Put more weight on the sitting/standing boundary; add label smoothing and cosine learning-rate decay."
+  },
+  {
+   "strategy": "Ensembling + temporal smoothing",
+   "weakness": "Isolated window errors",
+   "impact": "Medium",
+   "effort": "Medium",
+   "how": "Average several seeds or architectures (CNN-LSTM, CNN-GRU, Bi-LSTM); majority-vote or HMM over consecutive windows."
+  },
+  {
+   "strategy": "Leave-subjects-out CV",
+   "weakness": "Reliability of evaluation",
+   "impact": "Better estimates",
+   "effort": "Medium",
+   "how": "Group k-fold by subject so results reflect variation across people and include confidence intervals."
+  },
+  {
+   "strategy": "Per-user fine-tuning",
+   "weakness": "Weak subjects (9, 10)",
+   "impact": "High for those users",
+   "effort": "Medium",
+   "how": "Fine-tune only the classifier head on a short calibration recording (transfer learning)."
+  },
+  {
+   "strategy": "TFLite + quantisation",
+   "weakness": "Deployment cost",
+   "impact": "Smaller / faster model",
+   "effort": "Low",
+   "how": "At about 230k parameters (under 1 MB) the model already fits a phone or Raspberry Pi; post-training quantisation shrinks it further."
+  }
+ ],
+ "futureWork": [
+  "Implement the orientation-feature branch and attention pooling, and measure the effect on sitting/standing F1.",
+  "Adopt leave-subjects-out cross-validation and an ablation study (CNN-only, LSTM-only, CNN-LSTM, Bi-LSTM, CNN-GRU).",
+  "Explore Transformer-style self-attention and Temporal Convolutional Networks as alternatives to the LSTM.",
+  "Extend to richer datasets (WISDM, PAMAP2, Opportunity) with transfer learning between them.",
+  "Deploy the quantised model on a smartphone or Raspberry Pi for real-time recognition.",
+  "Add personalisation through few-shot fine-tuning and investigate privacy-preserving federated training."
+ ],
+ "references": [
+  "Abadi, M., et al. (2016). TensorFlow: A system for large-scale machine learning. OSDI, 265–283.",
+  "Anguita, D., Ghio, A., Oneto, L., Parra, X., & Reyes-Ortiz, J. L. (2013). A public domain dataset for human activity recognition using smartphones. ESANN, 437–442.",
+  "Bahdanau, D., Cho, K., & Bengio, Y. (2015). Neural machine translation by jointly learning to align and translate. ICLR.",
+  "Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep learning. MIT Press.",
+  "Goodfellow, I., et al. (2014). Generative adversarial nets. NeurIPS 27, 2672–2680.",
+  "Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural Computation, 9(8), 1735–1780.",
+  "Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. ICML, 448–456.",
+  "Kingma, D. P., & Ba, J. (2015). Adam: A method for stochastic optimization. ICLR.",
+  "LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278–2324.",
+  "Ordóñez, F. J., & Roggen, D. (2016). Deep convolutional and LSTM recurrent neural networks for multimodal wearable activity recognition. Sensors, 16(1), 115.",
+  "Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. JMLR, 12, 2825–2830.",
+  "Reyes-Ortiz, J., Anguita, D., Ghio, A., Oneto, L., & Parra, X. (2012). Human activity recognition using smartphones [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C54S4K",
+  "Srivastava, N., et al. (2014). Dropout: A simple way to prevent neural networks from overfitting. JMLR, 15, 1929–1958.",
+  "Um, T. T., et al. (2017). Data augmentation of wearable sensor data for Parkinson's disease monitoring using convolutional neural networks. ICMI, 216–220.",
+  "Wang, J., Chen, Y., Hao, S., Peng, X., & Hu, L. (2019). Deep learning for sensor-based activity recognition: A survey. Pattern Recognition Letters, 119, 3–11.",
+  "Yosinski, J., Clune, J., Bengio, Y., & Lipson, H. (2014). How transferable are features in deep neural networks? NeurIPS 27, 3320–3328."
+ ]
+}
